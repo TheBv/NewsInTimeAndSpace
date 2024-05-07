@@ -9,6 +9,8 @@ services:
     #  - database
     volumes:
       - ./MongoDBConfig.cfg:/usr/local/tomcat/server/MongoDBConfig.cfg
+    network_mode:
+        "host"
   # database:
   #  image: mongo
   #  restart: always

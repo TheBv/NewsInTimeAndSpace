@@ -44,7 +44,7 @@ public class MongoDBConnectionHandler {
      * Constructs ConnectionHandler with pre-defined properties file
      */
     private MongoDBConnectionHandler() {
-        connectDB("server/MongoDBConfig.cfg");
+        connectDB("MongoDBConfig.cfg");
     }
 
     /**
@@ -83,8 +83,8 @@ public class MongoDBConnectionHandler {
         // Cfg einlesen
         Properties prop = Helper.readProperties(fileName);
         try {
-            this.credential = MongoCredential.createCredential(prop.getProperty("remote_user"),
-                    prop.getProperty("remote_database"), (prop.getProperty("remote_password")).toCharArray());
+            this.credential = MongoCredential.createScramSha1Credential(prop.getProperty("remote_user"), (String) prop.get("remote_auth_database"),
+                    (prop.getProperty("remote_password")).toCharArray());
             this.mongoClient = new MongoClient(
                     new ServerAddress(prop.getProperty("remote_host"),
                             Integer.parseInt(prop.getProperty("remote_port"))),

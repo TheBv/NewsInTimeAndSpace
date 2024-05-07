@@ -41,6 +41,7 @@ public class App implements SparkApplication {
 	 */
 	public static void main(String[] args) {
 		App app = new App();
+		port(8080);
 		app.init();
 	}
 
@@ -73,11 +74,11 @@ public class App implements SparkApplication {
 		});
 
 		// root response
-		get("/", (Request req, Response res) -> {
+		get("/news/", (Request req, Response res) -> {
 			return "{\"success\":\"true\"}";
 		});
 
-		path("/events", () -> {
+		path("/news/events", () -> {
 			get("", Events::getEvents); // Filter, and return whole Events
 			get("/ids", Events::getEventIDs); // Filter, and return Event IDs
 
@@ -86,7 +87,7 @@ public class App implements SparkApplication {
 
 		});
 
-		path("/groups", () -> {
+		path("/news/groups", () -> {
 			get("/country", Groups::getGroupsCountryAll);
 			get("/country/ids", Groups::getGroupsCountryId);
 		    	get("/country/test", Groups::testGroups);
@@ -96,12 +97,12 @@ public class App implements SparkApplication {
 			get("/city/ids", Groups::getGroupsCityId);
 		});
 
-		path("/extra", () -> {
+		path("/news/extra", () -> {
 			get("/types", Extras::getTypes);
 			get("/actors", Extras::getActors);
 		});
 
-		path("/update", () -> {
+		path("/news/update", () -> {
 			put("/:date", Update::donwloadDate);
 		});
 
