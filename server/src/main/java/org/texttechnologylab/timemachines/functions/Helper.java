@@ -62,7 +62,7 @@ public class Helper {
 
         String[] actors1 = req.queryParamsValues("actor");
         if (actors1 != null) {
-            Bson actorsOrFilter = Filters.eq("_id", null);
+            Bson actorsOrFilter = Filters.ne("_id", null);
             for (String actor : actors1) {
                 if (actor.contains("~")) {
                     String[] splitActors = actor.split("~");
@@ -72,7 +72,7 @@ public class Helper {
                                     Filters.in("Actors.Name", splitActors[1].toUpperCase())));
                     continue;
                 }
-                actorsOrFilter = Filters.or(actorsOrFilter, Filters.in("Actors.Name", actor.toUpperCase()));
+                actorsOrFilter = Filters.and(actorsOrFilter, Filters.in("Actors.Name", actor.toUpperCase()));
             }
             filter = Filters.and(filter, actorsOrFilter);
         }
