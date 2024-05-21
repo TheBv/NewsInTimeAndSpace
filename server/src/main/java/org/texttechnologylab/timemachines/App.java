@@ -47,7 +47,7 @@ public class App implements SparkApplication {
 	public static void main(String[] args) {
 		try {
 			// This block configure the logger with handler and formatter
-			fh = new FileHandler("./log.log");
+			fh = new FileHandler("./log.log", true);
 			fileLogger.addHandler(fh);
 			fileLogger.setUseParentHandlers(false);
 			SimpleFormatter formatter = new SimpleFormatter();
@@ -86,7 +86,8 @@ public class App implements SparkApplication {
 
 		before(((request, response) -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(request.requestMethod());
+			sb.append(request.ip());
+			sb.append(" | ").append(request.requestMethod());
 			sb.append(" | ").append(request.url());
 			sb.append(" | ").append(getParamList(request));
 			fileLogger.info(sb.toString());
