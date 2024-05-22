@@ -14,7 +14,7 @@ interface Actor {
 export const useActors = () => {
     const [actors, setActors] = useState<Actor[]>([]);
     useEffect(() => {
-        fetch(`${baseURL}/news/extra/actors`)
+        fetch(`${baseURL}/news/extra/actors?startTime=2024-04-08&endTime=2024-04-08`)
             .then(response => response.json())
             .then(data => setActors(data.results))
     }, [])

@@ -119,7 +119,7 @@ public class Groups {
 		Bson filter = Helper.createBsonFilter(req);
 
 		String limit = req.queryParams("limit");
-		int limitInt = 0;
+		int limitInt = 10000;
 		if (limit != null)
 			limitInt = Integer.parseInt(limit);
 		starttime = System.currentTimeMillis();

@@ -32,7 +32,7 @@ public class CsvDownloaderThread implements Runnable {
     public void run() {
         CsvDownloader downloader = new CsvDownloader();
         downloader.getEvents(dateTime);
-        //downloader.getGraph(dateTime);
+        downloader.getGraph(dateTime);
     }
 
 }
