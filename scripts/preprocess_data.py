@@ -16,6 +16,8 @@ def read_data(data_dir: str):
         "text": [],
         "special_tokens": []
     }
+    all_text = ""
+    with_floats = ""
     df = pd.read_csv(data_dir, sep=';').T
     headers = df.iloc[0]
     df = pd.DataFrame(df.values[1:], columns=headers)
@@ -24,8 +26,10 @@ def read_data(data_dir: str):
     for index, row in tqdm(df_filtered.iterrows(), total=df_filtered.shape[0], desc="Reading data"):
         label_i = row["Szenario"]
         text_i = row["Path Description"]
+        with_floats += f"{label_i} -> {text_i}\n"
         if not isinstance(text_i, str):
             continue
+        all_text += f"{label_i} -> {text_i}\n"
         text_i = text_i.split("->")
         for sentence_i in text_i:
             if sentence_i == "":
@@ -33,6 +37,10 @@ def read_data(data_dir: str):
             pd_dict["labels"].append(label_i)
             pd_dict["text"].append(sentence_i)
             pd_dict["special_tokens"].append("")
+    with open("all_text.txt", "w", encoding="UTF-8") as text_file:
+        text_file.write(all_text)
+    with open("with_floats.txt", "w", encoding="UTF-8") as txt_file:
+        txt_file.write(with_floats)
     return pd_dict
 
 
@@ -45,7 +53,7 @@ def create_embeddings(data: dict):
 
 def reduce_dimensions(data: dict):
     reducer = Reducer("PACMAP", 2, 42)
-    embeddings = reducer.reducer(data["embeddings"], True)
+    embeddings = reducer.reducer(data["embeddings"], True).tolist()
     for c, vec_i in enumerate(embeddings):
         embeddings[c] = [float(np_float) for np_float in vec_i]
     data["reduced_embeddings"] = embeddings
@@ -77,12 +85,17 @@ def run_pipeline(data_dir: str, output_dir: str):
         with gzip.open(out_dir, "wt", encoding="UTF-8") as json_file:
             json.dump(data, json_file, indent=2)
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.scatter(data["reduced_embeddings"][:, 0], data["reduced_embeddings"][:, 1], cmap="Spectral", c=data["labels"])
+    x_points = [i[0] for i in data["reduced_embeddings"]]
+    y_points = [i[1] for i in data["reduced_embeddings"]]
+    colors = ["red" if i == "Web(Patrick)" else "blue" for i in data["labels"]]
+    ax.scatter(x_points, y_points, cmap="Spectral", label=data["labels"], c=colors)
     #Legend
     # handles, labels = ax.get_legend_handles_labels()
     # unique_labels = list(set(data["labels"]))
     # unique_labels.sort()
     # ax.legend(handles, unique_labels, title="Szenario")
+    ax.legend(title="Szenario")
+    ax.grid(True)
     plt.savefig(f"{output_dir}/plot.png")
 
 
