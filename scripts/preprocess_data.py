@@ -53,7 +53,7 @@ def create_embeddings(data: dict):
 
 
 def reduce_dimensions(data: dict):
-    reducer = Reducer("TSNE", 2, 42)
+    reducer = Reducer("PACMAP", 2, 42)
     embeddings = reducer.reducer(data["embeddings"], True).tolist()
     for c, vec_i in enumerate(embeddings):
         embeddings[c] = [float(np_float) for np_float in vec_i]
@@ -106,4 +106,4 @@ def run_pipeline(data_dir: str, output_dir: str):
 
 
 if __name__ == '__main__':
-    run_pipeline("Data_texts.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace")
+    run_pipeline("Data_texts.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace/PACMAP")
