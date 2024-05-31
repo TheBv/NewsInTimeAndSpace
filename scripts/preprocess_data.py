@@ -37,7 +37,7 @@ def read_data(data_dir: str):
 
 
 def create_embeddings(data: dict):
-    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cuda:0cona")
+    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cuda:0")
     embeddings = converter.encode_to_vec(data["text"])
     data["embeddings"] = embeddings
     return data
