@@ -52,8 +52,8 @@ def create_embeddings(data: dict):
     return data
 
 
-def reduce_dimensions(data: dict):
-    reducer = Reducer("PACMAP", 2, 42)
+def reduce_dimensions(data: dict, arts="PACMAP"):
+    reducer = Reducer(arts, 2, 42)
     embeddings = reducer.reducer(data["embeddings"], True).tolist()
     for c, vec_i in enumerate(embeddings):
         embeddings[c] = [float(np_float) for np_float in vec_i]
@@ -61,7 +61,7 @@ def reduce_dimensions(data: dict):
     return data
 
 
-def run_pipeline(data_dir: str, output_dir: str):
+def run_pipeline(data_dir: str, output_dir: str, arts="PACMAP"):
     print("Reading data")
     data = read_data(data_dir)
     if os.path.exists(f"{output_dir}/Embeddings.json.gz"):
@@ -79,7 +79,7 @@ def run_pipeline(data_dir: str, output_dir: str):
             data = json.load(json_file)
     else:
         print("Reducing dimensions")
-        data = reduce_dimensions(data)
+        data = reduce_dimensions(data, arts)
         print("Saving data")
         out_dir = f"{output_dir}/Data.json.gz"
         os.makedirs(os.path.dirname(out_dir), exist_ok=True)
@@ -102,8 +102,10 @@ def run_pipeline(data_dir: str, output_dir: str):
     ref_patch = mpatches.Patch(color='green', label='GPT Prompt')
     plt.legend(handles=[site_patch, nits_patch, ref_patch])
 
-    plt.savefig(f"{output_dir}/text_tsne.png")
+    plt.savefig(f"{output_dir}/text_{arts}.png")
 
 
 if __name__ == '__main__':
-    run_pipeline("Data_texts.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace/PACMAP")
+    arts_reducer = ["PCA", "TSNE","PACMAP", "TRIMAP", "UMAP"]
+    for art_i in arts_reducer:
+        run_pipeline("Data_texts.csv", f"/storage/projects/bagci/data/NewsInTimeAndSpace/{art_i}", art_i)
