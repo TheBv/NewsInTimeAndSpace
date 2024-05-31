@@ -50,15 +50,25 @@ def reduce_dimensions(data: dict):
 def run_pipeline(data_dir: str, output_dir: str):
     print("Reading data")
     data = read_data(data_dir)
-    print("Creating embeddings")
-    data = create_embeddings(data)
-    print("Reducing dimensions")
-    data = reduce_dimensions(data)
-    print("Saving data")
-    out_dir = f"{output_dir}/Data.json.gz"
-    os.makedirs(os.path.dirname(out_dir), exist_ok=True)
-    with gzip.open(out_dir, "wt", encoding="UTF-8") as json_file:
-        json.dump(data, json_file, indent=2)
+    if os.path.exists(f"{output_dir}/Embeddings.json.gz"):
+        with gzip.open(f"{output_dir}/Embeddings.json.gz", "rt", encoding="UTF-8") as json_file:
+            data = json.load(json_file)
+    else:
+        print("Creating embeddings")
+        data = create_embeddings(data)
+        with gzip.open(f"{output_dir}/Embeddings.json.gz", "wt", encoding="UTF-8") as json_file:
+            json.dump(data, json_file, indent=2)
+    if os.path.exists(f"{output_dir}/Data.json.gz"):
+        with gzip.open(f"{output_dir}/Data.json.gz", "rt", encoding="UTF-8") as json_file:
+            data = json.load(json_file)
+    else:
+        print("Reducing dimensions")
+        data = reduce_dimensions(data)
+        print("Saving data")
+        out_dir = f"{output_dir}/Data.json.gz"
+        os.makedirs(os.path.dirname(out_dir), exist_ok=True)
+        with gzip.open(out_dir, "wt", encoding="UTF-8") as json_file:
+            json.dump(data, json_file, indent=2)
     fig, ax = plt.subplots(figsize=(10, 10))
     ax.scatter(data["reduced_embeddings"][:, 0], data["reduced_embeddings"][:, 1], cmap="Spectral", c=data["labels"])
     #Legend
@@ -70,4 +80,4 @@ def run_pipeline(data_dir: str, output_dir: str):
 
 
 if __name__ == '__main__':
-    run_pipeline("data.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace")
+    run_pipeline("Data.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace")
