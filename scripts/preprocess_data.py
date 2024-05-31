@@ -7,6 +7,7 @@ from reduce_function import Reducer
 import json
 import gzip
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 def read_data(data_dir: str):
@@ -20,7 +21,7 @@ def read_data(data_dir: str):
     df = pd.DataFrame(df.values[1:], columns=headers)
     df_filtered = df.loc[df['Szenario'].isin(["Web(Patrick)", "VR(Patrick)"])]
     print(f"Number of rows: {df_filtered.shape[0]} and number of columns: {df_filtered.shape[1]}")
-    for index, row in df_filtered.iterrows():
+    for index, row in tqdm(df_filtered.iterrows(), total=df_filtered.shape[0], desc="Reading data"):
         label_i = row["Szenario"]
         text_i = row["Path Description"]
         if not isinstance(text_i, str):
