@@ -46,6 +46,8 @@ def create_embeddings(data: dict):
 def reduce_dimensions(data: dict):
     reducer = Reducer("PACMAP", 2, 42)
     embeddings = reducer.reducer(data["embeddings"], True)
+    for c, vec_i in enumerate(embeddings):
+        embeddings[c] = [float(np_float) for np_float in vec_i]
     data["reduced_embeddings"] = embeddings
     return data
 
