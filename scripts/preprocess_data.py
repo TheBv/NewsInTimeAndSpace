@@ -6,6 +6,7 @@ from BERT_converter import BertConverter, BertSentenceConverter
 from reduce_function import Reducer
 import json
 import gzip
+import matplotlib.pyplot as plt
 
 
 def read_data(data_dir: str):
@@ -33,7 +34,7 @@ def read_data(data_dir: str):
 
 
 def create_embeddings(data: dict):
-    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cpu")
+    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cuda:0cona")
     embeddings = converter.encode_to_vec(data["text"])
     data["embeddings"] = embeddings
     return data
@@ -58,6 +59,14 @@ def run_pipeline(data_dir: str, output_dir: str):
     os.makedirs(os.path.dirname(out_dir), exist_ok=True)
     with gzip.open(out_dir, "wt", encoding="UTF-8") as json_file:
         json.dump(data, json_file, indent=2)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.scatter(data["reduced_embeddings"][:, 0], data["reduced_embeddings"][:, 1], cmap="Spectral", c=data["labels"])
+    #Legend
+    # handles, labels = ax.get_legend_handles_labels()
+    # unique_labels = list(set(data["labels"]))
+    # unique_labels.sort()
+    # ax.legend(handles, unique_labels, title="Szenario")
+    plt.savefig(f"{output_dir}/plot.png")
 
 
 if __name__ == '__main__':
