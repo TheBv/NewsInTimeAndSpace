@@ -8,7 +8,7 @@ import json
 import gzip
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-
+import matplotlib.patches as mpatches
 
 def read_data(data_dir: str):
     pd_dict = {
@@ -21,7 +21,7 @@ def read_data(data_dir: str):
     df = pd.read_csv(data_dir, sep=';').T
     headers = df.iloc[0]
     df = pd.DataFrame(df.values[1:], columns=headers)
-    df_filtered = df.loc[df['Szenario'].isin(["Web(Patrick)", "VR(Patrick)"])]
+    df_filtered = df.loc[df['Szenario'].isin(["Web(Patrick)", "VR(Patrick)", "Reference"])]
     print(f"Number of rows: {df_filtered.shape[0]} and number of columns: {df_filtered.shape[1]}")
     for index, row in tqdm(df_filtered.iterrows(), total=df_filtered.shape[0], desc="Reading data"):
         label_i = row["Szenario"]
@@ -37,6 +37,7 @@ def read_data(data_dir: str):
             pd_dict["labels"].append(label_i)
             pd_dict["text"].append(sentence_i)
             pd_dict["special_tokens"].append("")
+    
     with open("all_text.txt", "w", encoding="UTF-8") as text_file:
         text_file.write(all_text)
     with open("with_floats.txt", "w", encoding="UTF-8") as txt_file:
@@ -45,14 +46,14 @@ def read_data(data_dir: str):
 
 
 def create_embeddings(data: dict):
-    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cuda:0")
+    converter = BertSentenceConverter("distiluse-base-multilingual-cased-v2", "cpu")
     embeddings = converter.encode_to_vec(data["text"])
     data["embeddings"] = embeddings
     return data
 
 
 def reduce_dimensions(data: dict):
-    reducer = Reducer("PACMAP", 2, 42)
+    reducer = Reducer("TSNE", 2, 42)
     embeddings = reducer.reducer(data["embeddings"], True).tolist()
     for c, vec_i in enumerate(embeddings):
         embeddings[c] = [float(np_float) for np_float in vec_i]
@@ -87,7 +88,7 @@ def run_pipeline(data_dir: str, output_dir: str):
     fig, ax = plt.subplots(figsize=(10, 10))
     x_points = [i[0] for i in data["reduced_embeddings"]]
     y_points = [i[1] for i in data["reduced_embeddings"]]
-    colors = ["red" if i == "Web(Patrick)" else "blue" for i in data["labels"]]
+    colors = ["red" if i == "Web(Patrick)" else "blue" if i == "VR(Patrick)" else "green" for i in data["labels"]]
     ax.scatter(x_points, y_points, cmap="Spectral", label=data["labels"], c=colors)
     #Legend
     # handles, labels = ax.get_legend_handles_labels()
@@ -96,8 +97,13 @@ def run_pipeline(data_dir: str, output_dir: str):
     # ax.legend(handles, unique_labels, title="Szenario")
     ax.legend(title="Szenario")
     ax.grid(True)
-    plt.savefig(f"{output_dir}/plot.png")
+    site_patch = mpatches.Patch(color='red', label='SITE')
+    nits_patch = mpatches.Patch(color='blue', label='NiTS')
+    ref_patch = mpatches.Patch(color='green', label='GPT Prompt')
+    plt.legend(handles=[site_patch, nits_patch, ref_patch])
+
+    plt.savefig(f"{output_dir}/text_tsne.png")
 
 
 if __name__ == '__main__':
-    run_pipeline("Data.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace")
+    run_pipeline("Data_texts.csv", "/storage/projects/bagci/data/NewsInTimeAndSpace")

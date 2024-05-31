@@ -3,9 +3,9 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
-from pacmap import PaCMAP
-from trimap import TRIMAP
-from umap import UMAP
+#from pacmap import PaCMAP
+#from trimap import TRIMAP
+#from umap import UMAP
 
 
 class Reducer:
