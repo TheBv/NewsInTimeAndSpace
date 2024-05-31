@@ -59,6 +59,8 @@ def run_pipeline(data_dir: str, output_dir: str):
     else:
         print("Creating embeddings")
         data = create_embeddings(data)
+        print("Saving embeddings")
+        os.makedirs(os.path.dirname(f"{output_dir}/Embeddings.json.gz"), exist_ok=True)
         with gzip.open(f"{output_dir}/Embeddings.json.gz", "wt", encoding="UTF-8") as json_file:
             json.dump(data, json_file, indent=2)
     if os.path.exists(f"{output_dir}/Data.json.gz"):
