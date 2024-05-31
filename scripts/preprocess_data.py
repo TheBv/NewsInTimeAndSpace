@@ -23,6 +23,8 @@ def read_data(data_dir: str):
     for index, row in df_filtered.iterrows():
         label_i = row["Szenario"]
         text_i = row["Path Description"]
+        if not isinstance(text_i, str):
+            continue
         text_i = text_i.split("->")
         for sentence_i in text_i:
             if sentence_i == "":
